@@ -1,0 +1,317 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — SkyReserve{% endblock %}
+
+{% block body %}
+<div class="app-layout">
+    {% include 'sidebar.html' %}
+
+    <main class="main-content">
+        <!-- Top Navbar -->
+        <header class="top-navbar">
+            <div class="navbar-left">
+                <button class="sidebar-toggle-btn d-lg-none" onclick="toggleSidebar()">
+                    <i class="bi bi-list"></i>
+                </button>
+                <h1 class="page-title"><i class="bi bi-grid-1x2-fill me-2"></i>Dashboard</h1>
+            </div>
+            <div class="navbar-right">
+                <span class="navbar-date"><i class="bi bi-calendar3 me-1"></i> {{ now().strftime('%B %d, %Y') if now is defined else 'Today' }}</span>
+                <div class="navbar-avatar">
+                    <i class="bi bi-person-circle"></i>
+                    <span>Admin</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="px-4 pt-3">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle me-2"></i>{{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div class="content-area">
+            <!-- Hero Banner with cinematic aviation image -->
+            <div class="hero-banner animate-fade-in">
+                <div class="hero-banner-bg" style="background-image: url('https://images.unsplash.com/photo-1556388158-158ea5ccacbd?w=1400&q=80')"></div>
+                <!-- Animated plane path SVG -->
+                <div class="hero-plane-path">
+                    <svg viewBox="0 0 200 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 60 Q50 10 100 40 Q150 70 190 20" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
+                        <circle cx="10" cy="60" r="4" fill="rgba(255,255,255,0.6)">
+                            <animate attributeName="opacity" values="0.4;1;0.4" dur="2s" repeatCount="indefinite"/>
+                        </circle>
+                        <circle cx="190" cy="20" r="4" fill="rgba(255,255,255,0.6)">
+                            <animate attributeName="opacity" values="0.4;1;0.4" dur="2s" repeatCount="indefinite" begin="1s"/>
+                        </circle>
+                        <text font-size="16" x="85" y="25" fill="rgba(255,255,255,0.5)">✈</text>
+                    </svg>
+                </div>
+                <div class="hero-banner-content">
+                    <h2>Welcome to SkyReserve</h2>
+                    <p>Central air-reservation dashboard for 6 airlines across 12 cities worldwide</p>
+                </div>
+            </div>
+
+            <!-- Stats Cards Row -->
+            <div class="row g-4 mb-4">
+                <div class="col-xl-3 col-md-6">
+                    <div class="stat-card stat-card-blue animate-fade-in anim-d1">
+                        <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Total Customers</span>
+                            <span class="stat-value" id="stat-customers">{{ stats.total_customers }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="stat-card stat-card-emerald animate-fade-in anim-d2">
+                        <div class="stat-icon"><i class="bi bi-airplane-fill"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Total Flights</span>
+                            <span class="stat-value" id="stat-flights">{{ stats.total_flights }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="stat-card stat-card-amber animate-fade-in anim-d3">
+                        <div class="stat-icon"><i class="bi bi-bookmark-star-fill"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Total Bookings</span>
+                            <span class="stat-value" id="stat-bookings">{{ stats.total_bookings }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="stat-card stat-card-rose animate-fade-in anim-d4">
+                        <div class="stat-icon"><i class="bi bi-x-octagon-fill"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Cancelled</span>
+                            <span class="stat-value" id="stat-cancelled">{{ stats.cancelled }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Revenue Cards -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <div class="stat-card stat-card-purple animate-fade-in anim-d5">
+                        <div class="stat-icon"><i class="bi bi-cash-stack"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Total Revenue</span>
+                            <span class="stat-value">${{ "%.2f"|format(stats.total_revenue) }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="stat-card stat-card-teal animate-fade-in anim-d6">
+                        <div class="stat-icon"><i class="bi bi-wallet2"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Total Collected</span>
+                            <span class="stat-value">${{ "%.2f"|format(stats.total_paid) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="row g-4 mb-4">
+                <div class="col-lg-7">
+                    <div class="card-custom animate-fade-in anim-d7">
+                        <div class="card-custom-header">
+                            <h5><i class="bi bi-bar-chart-line-fill me-2"></i>City-wise Revenue</h5>
+                        </div>
+                        <div class="card-custom-body">
+                            <canvas id="cityRevenueChart" height="280"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="card-custom animate-fade-in anim-d8">
+                        <div class="card-custom-header">
+                            <h5><i class="bi bi-pie-chart-fill me-2"></i>Flight Occupancy</h5>
+                        </div>
+                        <div class="card-custom-body">
+                            <canvas id="occupancyChart" height="280"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Bookings -->
+            <div class="card-custom animate-fade-in anim-d8">
+                <div class="card-custom-header">
+                    <h5><i class="bi bi-clock-history me-2"></i>Recent Bookings</h5>
+                    <a href="{{ url_for('bookings') }}" class="btn btn-sm btn-outline-primary" style="border-radius:10px;font-weight:600;font-size:0.82rem;">View All <i class="bi bi-arrow-right ms-1"></i></a>
+                </div>
+                <div class="card-custom-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-custom">
+                            <thead>
+                                <tr>
+                                    <th>Booking #</th>
+                                    <th>Customer</th>
+                                    <th>Flight</th>
+                                    <th>City</th>
+                                    <th>Class</th>
+                                    <th>Price</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for b in recent %}
+                                <tr>
+                                    <td><span class="fw-semibold">#{{ b.booking_no }}</span></td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="customer-avatar avatar-{{ ['blue','emerald','amber','violet','rose','teal'][loop.index0 % 6] }}">
+                                                {{ b.customer_name[0] }}
+                                            </div>
+                                            {{ b.customer_name }}
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-primary-subtle text-primary" style="border-radius:8px;font-weight:650;">{{ b.flight_no }}</span></td>
+                                    <td>{{ b.booking_city }}</td>
+                                    <td>
+                                        {% if b.class_type == 'Business' %}
+                                        <span class="badge bg-warning-subtle text-warning" style="border-radius:8px">Business</span>
+                                        {% else %}
+                                        <span class="badge bg-info-subtle text-info" style="border-radius:8px">Economy</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="fw-bold">${{ "%.2f"|format(b.total_price) }}</td>
+                                    <td>
+                                        {% if b.status == 'Booked' %}
+                                        <span class="badge badge-status-booked">Booked</span>
+                                        {% elif b.status == 'Cancelled' %}
+                                        <span class="badge badge-status-cancelled">Cancelled</span>
+                                        {% else %}
+                                        <span class="badge badge-status-scratched">Scratched</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script id="city-revenue-data" type="application/json">{{ city_revenue | tojson }}</script>
+<script id="occupancy-data" type="application/json">{{ occupancy | tojson }}</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // City Revenue Bar Chart — Premium colors
+    const cityData = JSON.parse(document.getElementById('city-revenue-data').textContent);
+    const cityLabels = cityData.map(d => d.booking_city);
+    const cityValues = cityData.map(d => parseFloat(d.revenue));
+
+    const gradientColors = [
+        'rgba(12, 142, 235, 0.85)',
+        'rgba(16, 185, 129, 0.85)',
+        'rgba(245, 158, 11, 0.85)',
+        'rgba(239, 68, 68, 0.85)',
+        'rgba(139, 92, 246, 0.85)',
+        'rgba(20, 184, 166, 0.85)',
+        'rgba(236, 72, 153, 0.85)',
+        'rgba(249, 115, 22, 0.85)',
+        'rgba(34, 197, 94, 0.85)',
+        'rgba(99, 102, 241, 0.85)'
+    ];
+
+    new Chart(document.getElementById('cityRevenueChart'), {
+        type: 'bar',
+        data: {
+            labels: cityLabels,
+            datasets: [{
+                label: 'Revenue',
+                data: cityValues,
+                backgroundColor: gradientColors.slice(0, cityLabels.length),
+                borderColor: gradientColors.slice(0, cityLabels.length).map(c => c.replace('0.85', '1')),
+                borderWidth: 2,
+                borderRadius: 10,
+                borderSkipped: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#0f172a',
+                    titleFont: { family: 'Plus Jakarta Sans', weight: 600 },
+                    bodyFont: { family: 'Plus Jakarta Sans' },
+                    padding: 14,
+                    cornerRadius: 10,
+                    displayColors: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0,0,0,0.04)', drawBorder: false },
+                    ticks: { font: { family: 'Plus Jakarta Sans', size: 11, weight: 500 }, color: '#94a3b8' }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { family: 'Plus Jakarta Sans', size: 11, weight: 500 }, color: '#64748b' }
+                }
+            }
+        }
+    });
+
+    // Flight Occupancy Doughnut
+    const occData = JSON.parse(document.getElementById('occupancy-data').textContent);
+    const totalBooked = occData.reduce((s, d) => s + parseInt(d.booked), 0);
+    const totalSeats = occData.reduce((s, d) => s + parseInt(d.total), 0);
+    const available = totalSeats - totalBooked;
+
+    new Chart(document.getElementById('occupancyChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Booked Seats', 'Available Seats'],
+            datasets: [{
+                data: [totalBooked, available],
+                backgroundColor: ['rgba(12, 142, 235, 0.85)', 'rgba(226, 232, 240, 0.6)'],
+                borderColor: ['rgba(12, 142, 235, 1)', 'rgba(203, 213, 225, 1)'],
+                borderWidth: 2,
+                cutout: '68%',
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { font: { family: 'Plus Jakarta Sans', size: 12, weight: 500 }, padding: 24, usePointStyle: true, pointStyleWidth: 12 }
+                },
+                tooltip: {
+                    backgroundColor: '#0f172a',
+                    titleFont: { family: 'Plus Jakarta Sans' },
+                    bodyFont: { family: 'Plus Jakarta Sans' },
+                    padding: 14,
+                    cornerRadius: 10,
+                    displayColors: false
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

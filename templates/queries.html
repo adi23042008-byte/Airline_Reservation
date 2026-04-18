@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% block title %}SQL Queries — SkyReserve{% endblock %}
+
+{% block body %}
+<div class="app-layout">
+    {% include 'sidebar.html' %}
+
+    <main class="main-content">
+        <header class="top-navbar">
+            <div class="navbar-left">
+                <button class="sidebar-toggle-btn d-lg-none" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
+                <h1 class="page-title"><i class="bi bi-database-fill-gear me-2"></i>SQL Query Results</h1>
+            </div>
+            <div class="navbar-right">
+                <div class="navbar-avatar"><i class="bi bi-person-circle"></i><span>Admin</span></div>
+            </div>
+        </header>
+
+        <div class="content-area">
+            <!-- Page Hero -->
+            <div class="page-hero animate-fade-in">
+                <div class="page-hero-bg" style="background-image: url('https://images.unsplash.com/photo-1518432031352-d6fc5c10da5a?w=1400&q=80')"></div>
+                <div class="page-hero-content">
+                    <h3><i class="bi bi-database-fill-gear me-2"></i>DBMS Case Study Outcomes</h3>
+                    <p>10 required SQL query results — Click any card to execute and view live results</p>
+                </div>
+            </div>
+
+            <!-- Query Cards Grid -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-6 col-lg-4">
+                    <button class="query-card animate-fade-in" onclick="runQuery(1)" id="qbtn-1">
+                        <div class="query-number">Q1</div>
+                        <div class="query-desc">Customers living in Canada (sorted by customer_id)</div>
+                    </button>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <button class="query-card animate-fade-in anim-d1" onclick="runQuery(2)" id="qbtn-2">
+                        <div class="query-number">Q2</div>
+                        <div class="query-desc">Distinct customers who made bookings</div>
+                    </button>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <button class="query-card animate-fade-in anim-d2" onclick="runQuery(3)" id="qbtn-3">
+                        <div class="query-number">Q3</div>
+                        <div class="query-desc">Currency exchange rate &gt; 1 (sorted by from/to currency)</div>
+                    </button>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <button class="query-card animate-fade-in anim-d3" onclick="runQuery(4)" id="qbtn-4">
+                        <div class="query-number">Q4</div>
+                        <div class="query-desc">Flight availability: Toronto (YYZ) → New York (JFK)</div>
+                    </button>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <button class="query-card animate-fade-in anim-d4" onclick="runQuery(5)" id="qbtn-5">
+                        <div class="query-number">Q5</div>
+                        <div class="query-desc">Customers with no bookings (customer_id only)</div>
+                    </button>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <button class="query-card animate-fade-in anim-d5" onclick="runQuery(6)" id="qbtn-6">
+                        <div class="query-number">Q6</div>
+                        <div class="query-desc">Customer name, phone (formatted), and email</div>
+                    </button>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <button class="query-card animate-fade-in anim-d6" onclick="runQuery(7)" id="qbtn-7">
+                        <div class="query-number">Q7</div>
+                        <div class="query-desc">All cancelled bookings with full details</div>
+                    </button>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <button class="query-card animate-fade-in anim-d7" onclick="runQuery(8)" id="qbtn-8">
+                        <div class="query-number">Q8</div>
+                        <div class="query-desc">Total price, payment &amp; balance per city</div>
+                    </button>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <button class="query-card animate-fade-in anim-d8" onclick="runQuery(9)" id="qbtn-9">
+                        <div class="query-number">Q9</div>
+                        <div class="query-desc">Recalculated total_price with airport tax changes</div>
+                    </button>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <button class="query-card animate-fade-in anim-d8" onclick="runQuery(10)" id="qbtn-10">
+                        <div class="query-number">Q10</div>
+                        <div class="query-desc">Bookings, emails, phones &amp; faxes per customer</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Result Display Area -->
+            <div id="queryResultArea" class="d-none">
+                <div class="card-custom mb-3 animate-fade-in">
+                    <div class="card-custom-header">
+                        <h5 id="queryTitle"><i class="bi bi-play-circle me-2"></i>Query Result</h5>
+                        <span class="badge bg-success" style="border-radius:8px;font-weight:650" id="rowCount">0 rows</span>
+                    </div>
+                </div>
+
+                <!-- SQL Display -->
+                <div class="card-custom mb-3">
+                    <div class="card-custom-header">
+                        <h6 class="mb-0"><i class="bi bi-code-slash me-2"></i>SQL Query</h6>
+                        <button class="btn btn-sm btn-outline-primary" style="border-radius:8px;font-weight:600" onclick="copySQL()">
+                            <i class="bi bi-clipboard me-1"></i>Copy
+                        </button>
+                    </div>
+                    <div class="card-custom-body">
+                        <pre class="sql-display" id="sqlDisplay"></pre>
+                    </div>
+                </div>
+
+                <!-- Results Table -->
+                <div class="card-custom">
+                    <div class="card-custom-header">
+                        <h6 class="mb-0"><i class="bi bi-table me-2"></i>Results</h6>
+                    </div>
+                    <div class="card-custom-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-custom" id="resultTable">
+                                <thead id="resultHead"></thead>
+                                <tbody id="resultBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading -->
+            <div id="queryLoading" class="d-none text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-3 text-muted fw-medium">Executing query...</p>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let activeQueryBtn = null;
+
+async function runQuery(num) {
+    if (activeQueryBtn) activeQueryBtn.classList.remove('query-card-active');
+    activeQueryBtn = document.getElementById('qbtn-' + num);
+    activeQueryBtn.classList.add('query-card-active');
+
+    document.getElementById('queryResultArea').classList.add('d-none');
+    document.getElementById('queryLoading').classList.remove('d-none');
+
+    try {
+        const response = await fetch('/api/query/' + num);
+        const data = await response.json();
+
+        document.getElementById('queryLoading').classList.add('d-none');
+        document.getElementById('queryResultArea').classList.remove('d-none');
+
+        document.getElementById('queryTitle').innerHTML = '<i class="bi bi-play-circle me-2"></i>' + data.title;
+        document.getElementById('rowCount').textContent = data.data.length + ' rows';
+        document.getElementById('sqlDisplay').textContent = data.sql;
+
+        const thead = document.getElementById('resultHead');
+        const tbody = document.getElementById('resultBody');
+        thead.innerHTML = '';
+        tbody.innerHTML = '';
+
+        if (data.data.length > 0) {
+            const headerRow = document.createElement('tr');
+            const columns = Object.keys(data.data[0]);
+            columns.forEach(col => {
+                const th = document.createElement('th');
+                th.textContent = col.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+
+            data.data.forEach(row => {
+                const tr = document.createElement('tr');
+                columns.forEach(col => {
+                    const td = document.createElement('td');
+                    let val = row[col];
+                    if (val === null || val === undefined) val = '—';
+                    td.textContent = val;
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        } else {
+            tbody.innerHTML = '<tr><td class="text-center py-5 text-muted"><i class="bi bi-inbox fs-3 d-block mb-2"></i>No results found</td></tr>';
+        }
+
+        // Smooth scroll to results
+        document.getElementById('queryResultArea').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (err) {
+        document.getElementById('queryLoading').classList.add('d-none');
+        alert('Error executing query: ' + err.message);
+    }
+}
+
+function copySQL() {
+    const sql = document.getElementById('sqlDisplay').textContent;
+    navigator.clipboard.writeText(sql).then(() => {
+        const btn = event.target.closest('button');
+        const origHTML = btn.innerHTML;
+        btn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Copied!';
+        btn.classList.replace('btn-outline-primary', 'btn-success');
+        setTimeout(() => {
+            btn.innerHTML = origHTML;
+            btn.classList.replace('btn-success', 'btn-outline-primary');
+        }, 2000);
+    });
+}
+</script>
+{% endblock %}

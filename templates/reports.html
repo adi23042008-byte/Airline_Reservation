@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% block title %}Reports — SkyReserve{% endblock %}
+
+{% block body %}
+<div class="app-layout">
+    {% include 'sidebar.html' %}
+
+    <main class="main-content">
+        <header class="top-navbar">
+            <div class="navbar-left">
+                <button class="sidebar-toggle-btn d-lg-none" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
+                <h1 class="page-title"><i class="bi bi-bar-chart-line-fill me-2"></i>Reports & Analytics</h1>
+            </div>
+            <div class="navbar-right">
+                <div class="navbar-avatar"><i class="bi bi-person-circle"></i><span>Admin</span></div>
+            </div>
+        </header>
+
+        <div class="content-area">
+            <!-- Page Hero with world map analytics theme -->
+            <div class="page-hero animate-fade-in">
+                <div class="page-hero-bg" style="background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1400&q=80')"></div>
+                <div class="page-hero-content">
+                    <h3><i class="bi bi-graph-up-arrow me-2"></i>Analytics & Intelligence</h3>
+                    <p>Revenue insights, airline performance, and booking analytics across all markets</p>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="row g-4 mb-4">
+                <div class="col-lg-6">
+                    <div class="card-custom animate-fade-in anim-d1">
+                        <div class="card-custom-header">
+                            <h5><i class="bi bi-pie-chart-fill me-2"></i>Booking Status Distribution</h5>
+                        </div>
+                        <div class="card-custom-body">
+                            <canvas id="statusChart" height="260"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card-custom animate-fade-in anim-d2">
+                        <div class="card-custom-header">
+                            <h5><i class="bi bi-graph-up-arrow me-2"></i>Revenue by Airline</h5>
+                        </div>
+                        <div class="card-custom-body">
+                            <canvas id="airlineChart" height="260"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- City Summary -->
+            <div class="card-custom animate-fade-in anim-d3 mb-4">
+                <div class="card-custom-header">
+                    <h5><i class="bi bi-geo-alt-fill me-2"></i>City-wise Revenue Summary</h5>
+                    <span class="badge bg-info" style="border-radius:8px;font-weight:600;border:none">Excludes cancelled</span>
+                </div>
+                <div class="card-custom-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-custom">
+                            <thead>
+                                <tr>
+                                    <th>City</th>
+                                    <th>Bookings</th>
+                                    <th>Revenue</th>
+                                    <th>Collected</th>
+                                    <th>Outstanding</th>
+                                    <th>Collection Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for c in city_summary %}
+                                {% set rate = (c.collected / c.revenue * 100) if c.revenue and c.revenue > 0 else 0 %}
+                                <tr>
+                                    <td><span class="fw-bold">{{ c.booking_city }}</span></td>
+                                    <td><span class="badge bg-primary-subtle text-primary" style="border-radius:8px;font-weight:650">{{ c.total_bookings }}</span></td>
+                                    <td class="fw-bold">${{ "%.2f"|format(c.revenue) }}</td>
+                                    <td><span style="color:var(--emerald-500);font-weight:600">${{ "%.2f"|format(c.collected) }}</span></td>
+                                    <td><span style="color:var(--rose-500);font-weight:600">${{ "%.2f"|format(c.revenue - c.collected) }}</span></td>
+                                    <td style="min-width:120px">
+                                        <div class="progress-bar-custom">
+                                            <div class="progress-fill {% if rate > 80 %}progress-success{% elif rate > 50 %}progress-warning{% else %}progress-danger{% endif %}"
+                                                 style="width: {{ rate }}%"></div>
+                                        </div>
+                                        <small class="fw-semibold text-muted">{{ "%.0f"|format(rate) }}%</small>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Airline & Status Summaries -->
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="card-custom animate-fade-in anim-d4">
+                        <div class="card-custom-header">
+                            <h5><i class="bi bi-airplane-fill me-2"></i>Airline Performance</h5>
+                        </div>
+                        <div class="card-custom-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-custom">
+                                    <thead><tr><th>Airline</th><th>Bookings</th><th>Revenue</th></tr></thead>
+                                    <tbody>
+                                        {% for a in airline_summary %}
+                                        <tr>
+                                            <td><span class="badge bg-info-subtle text-info" style="border-radius:8px;font-weight:650">{{ a.airline_name }}</span></td>
+                                            <td>{{ a.bookings }}</td>
+                                            <td class="fw-bold">${{ "%.2f"|format(a.revenue) }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card-custom animate-fade-in anim-d5">
+                        <div class="card-custom-header">
+                            <h5><i class="bi bi-clipboard-data-fill me-2"></i>Status Summary</h5>
+                        </div>
+                        <div class="card-custom-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-custom">
+                                    <thead><tr><th>Status</th><th>Count</th><th>Total Value</th></tr></thead>
+                                    <tbody>
+                                        {% for s in status_summary %}
+                                        <tr>
+                                            <td>
+                                                {% if s.status == 'Booked' %}<span class="badge badge-status-booked">{{ s.status }}</span>
+                                                {% elif s.status == 'Cancelled' %}<span class="badge badge-status-cancelled">{{ s.status }}</span>
+                                                {% else %}<span class="badge badge-status-scratched">{{ s.status }}</span>{% endif %}
+                                            </td>
+                                            <td class="fw-semibold">{{ s.cnt }}</td>
+                                            <td class="fw-bold">${{ "%.2f"|format(s.total) }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script id="status-data" type="application/json">{{ status_summary | tojson }}</script>
+<script id="airline-data" type="application/json">{{ airline_summary | tojson }}</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const statusData = JSON.parse(document.getElementById('status-data').textContent);
+    const statusColors = {
+        'Booked': 'rgba(16, 185, 129, 0.85)',
+        'Cancelled': 'rgba(239, 68, 68, 0.85)',
+        'Scratched': 'rgba(245, 158, 11, 0.85)'
+    };
+    const statusBorders = {
+        'Booked': 'rgba(16, 185, 129, 1)',
+        'Cancelled': 'rgba(239, 68, 68, 1)',
+        'Scratched': 'rgba(245, 158, 11, 1)'
+    };
+
+    new Chart(document.getElementById('statusChart'), {
+        type: 'doughnut',
+        data: {
+            labels: statusData.map(s => s.status),
+            datasets: [{
+                data: statusData.map(s => s.cnt),
+                backgroundColor: statusData.map(s => statusColors[s.status] || 'rgba(148,163,184,0.85)'),
+                borderColor: statusData.map(s => statusBorders[s.status] || 'rgba(148,163,184,1)'),
+                borderWidth: 2,
+                cutout: '62%',
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom', labels: { font: { family: 'Plus Jakarta Sans', size: 12, weight: 500 }, padding: 24, usePointStyle: true } },
+                tooltip: { backgroundColor: '#0f172a', padding: 14, cornerRadius: 10, displayColors: false, titleFont: { family: 'Plus Jakarta Sans' }, bodyFont: { family: 'Plus Jakarta Sans' } }
+            }
+        }
+    });
+
+    const airlineData = JSON.parse(document.getElementById('airline-data').textContent);
+    const barColors = [
+        'rgba(12, 142, 235, 0.85)', 'rgba(16, 185, 129, 0.85)', 'rgba(245, 158, 11, 0.85)',
+        'rgba(239, 68, 68, 0.85)', 'rgba(139, 92, 246, 0.85)', 'rgba(20, 184, 166, 0.85)'
+    ];
+
+    new Chart(document.getElementById('airlineChart'), {
+        type: 'bar',
+        data: {
+            labels: airlineData.map(a => a.airline_name),
+            datasets: [{
+                label: 'Revenue',
+                data: airlineData.map(a => parseFloat(a.revenue)),
+                backgroundColor: barColors.slice(0, airlineData.length),
+                borderRadius: 10,
+                borderSkipped: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { backgroundColor: '#0f172a', padding: 14, cornerRadius: 10, displayColors: false, titleFont: { family: 'Plus Jakarta Sans' }, bodyFont: { family: 'Plus Jakarta Sans' } } },
+            scales: {
+                y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.04)', drawBorder: false }, ticks: { font: { family: 'Plus Jakarta Sans', size: 11 }, color: '#94a3b8' } },
+                x: { grid: { display: false }, ticks: { font: { family: 'Plus Jakarta Sans', size: 11 }, color: '#64748b' } }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

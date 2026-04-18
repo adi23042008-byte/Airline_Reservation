@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block title %}Flight Availability — SkyReserve{% endblock %}
+
+{% block body %}
+<div class="app-layout">
+    {% include 'sidebar.html' %}
+
+    <main class="main-content">
+        <header class="top-navbar">
+            <div class="navbar-left">
+                <button class="sidebar-toggle-btn d-lg-none" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
+                <h1 class="page-title"><i class="bi bi-calendar-check-fill me-2"></i>Flight Availability</h1>
+            </div>
+            <div class="navbar-right">
+                <div class="navbar-avatar"><i class="bi bi-person-circle"></i><span>Admin</span></div>
+            </div>
+        </header>
+
+        <div class="content-area">
+            <!-- Page Hero -->
+            <div class="page-hero animate-fade-in">
+                <div class="page-hero-bg" style="background-image: url('https://images.unsplash.com/photo-1540962351504-03099e0a754b?w=1400&q=80')"></div>
+                <div class="page-hero-content">
+                    <h3><i class="bi bi-calendar-check-fill me-2"></i>Seat Availability</h3>
+                    <p>Real-time seat occupancy tracking across all flight schedules</p>
+                </div>
+            </div>
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+                <form method="GET" class="search-form">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" name="search" class="form-control" placeholder="Search by flight no or airport code..." value="{{ search }}">
+                        <button class="btn btn-primary" type="submit">Search</button>
+                        {% if search %}<a href="{{ url_for('availability') }}" class="btn btn-outline-secondary">Clear</a>{% endif %}
+                    </div>
+                </form>
+            </div>
+
+            <div class="card-custom animate-fade-in anim-d2">
+                <div class="card-custom-header">
+                    <h5><i class="bi bi-table me-2"></i>Availability Schedule</h5>
+                    <span class="badge bg-primary" style="border-radius:8px;font-weight:650;">{{ availability | length }} records</span>
+                </div>
+                <div class="card-custom-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-custom">
+                            <thead>
+                                <tr>
+                                    <th>Flight</th>
+                                    <th>Airline</th>
+                                    <th>Route</th>
+                                    <th>Departure</th>
+                                    <th>Arrival</th>
+                                    <th>Business</th>
+                                    <th>Economy</th>
+                                    <th>Occupancy</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for a in availability %}
+                                {% set total = a.total_business_seats + a.total_economy_seats %}
+                                {% set booked = a.booked_business_seats + a.booked_economy_seats %}
+                                {% set pct = (booked / total * 100) if total > 0 else 0 %}
+                                <tr>
+                                    <td><span class="fw-bold" style="color:var(--sky-600)">{{ a.flight_no }}</span></td>
+                                    <td><span class="badge bg-info-subtle text-info" style="border-radius:8px;font-weight:650">{{ a.airline_name }}</span></td>
+                                    <td>
+                                        <div class="route-badge">
+                                            <span class="route-dot"></span>
+                                            <span>{{ a.origin }}</span>
+                                            <span class="route-line"></span>
+                                            <span>{{ a.destination }}</span>
+                                            <span class="route-dot"></span>
+                                        </div>
+                                    </td>
+                                    <td><small>{{ a.departure_datetime.strftime('%Y-%m-%d %H:%M') }}</small></td>
+                                    <td><small>{{ a.arrival_datetime.strftime('%Y-%m-%d %H:%M') }}</small></td>
+                                    <td>
+                                        <span class="fw-bold">{{ a.booked_business_seats }}</span>
+                                        <span class="text-muted">/ {{ a.total_business_seats }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold">{{ a.booked_economy_seats }}</span>
+                                        <span class="text-muted">/ {{ a.total_economy_seats }}</span>
+                                    </td>
+                                    <td style="min-width:120px">
+                                        <div class="progress-bar-custom">
+                                            <div class="progress-fill {% if pct > 85 %}progress-danger{% elif pct > 60 %}progress-warning{% else %}progress-success{% endif %}"
+                                                 style="width: {{ pct }}%"></div>
+                                        </div>
+                                        <small class="text-muted fw-semibold">{{ "%.0f"|format(pct) }}%</small>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% if availability | length == 0 %}
+                                <tr><td colspan="8" class="text-center py-5 text-muted"><i class="bi bi-inbox fs-3 d-block mb-2"></i>No availability data found</td></tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% block title %}SkyReserve — Connecting the World Through the Skies{% endblock %}
+
+{% block body %}
+<!-- ═══════════════════════════════════════════════════════
+     3D IMMERSIVE AIRLINE HOMEPAGE
+     ═══════════════════════════════════════════════════════ -->
+
+<!-- Transparent Navbar -->
+<nav class="hero-navbar">
+    <div class="hero-navbar-inner">
+        <div class="hero-nav-brand">
+            <i class="bi bi-airplane-engines"></i>
+            <span>SkyReserve</span>
+        </div>
+        <div class="hero-nav-links">
+            <a href="#hero" class="hero-nav-link active">Home</a>
+            <a href="#globe-section" class="hero-nav-link">Interactive Map</a>
+            <a href="#features-section" class="hero-nav-link">Features</a>
+            <a href="#login-section" class="hero-nav-link btn-glow">System Login</a>
+        </div>
+    </div>
+</nav>
+
+<!-- SECTION 1: HERO INTRODUCTION -->
+<section class="hero-fullscreen" id="hero">
+    <!-- Particle Background -->
+    <div id="tsparticles" class="hero-particles"></div>
+
+    <!-- Hero Background Image (Immersive Sky view) -->
+    <div class="hero-bg-immersive"></div>
+    <div class="hero-gradient-overlay"></div>
+
+    <!-- Hero Text Content -->
+    <div class="hero-text-content gsap-hero" style="position: relative; z-index: 10; transform-style: preserve-3d;">
+        <p class="hero-tagline gsap-hero-item">✈ WELCOME TO A NEW ERA OF FLIGHT</p>
+        <h1 class="hero-headline gsap-hero-item">Connecting the World<br>Through the Skies</h1>
+        <p class="hero-subtext gsap-hero-item">Real-time flight tracking, premium airline routes, and global connectivity across 12 major cities and 6 international airlines.</p>
+        <div class="gsap-hero-item" style="margin-top: 2rem;">
+            <a href="#globe-section" class="hero-cta-btn gsap-3d-btn">
+                <span>Explore Routes 3D</span>
+                <i class="bi bi-globe"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Scroll Indicator -->
+    <div class="scroll-indicator gsap-scroll-fade">
+        <span>Scroll to Explore</span>
+        <i class="bi bi-chevron-down mt-2 d-block"></i>
+    </div>
+</section>
+
+<!-- SECTION 2: INTERACTIVE 3D GLOBE -->
+<section class="globe-section" id="globe-section">
+    <div class="globe-header gsap-fade-up">
+        <h2>Global Route Network</h2>
+        <p>Drag to rotate. Scroll to zoom. Hover over arcs and glowing cities to view interactive flight data.</p>
+        <button id="resetGlobeBtn" class="btn btn-outline-light btn-sm mt-3 gsap-3d-btn" style="border-radius:20px;backdrop-filter:blur(5px);"><i class="bi bi-arrow-counterclockwise me-1"></i> Reset View</button>
+    </div>
+    
+    <!-- Globe Container -->
+    <div id="globeViz" class="globe-container"></div>
+</section>
+
+<!-- SECTION 3: 3D ANIMATED FEATURES & DESTINATIONS -->
+<section class="features-section" id="features-section">
+    <div class="container text-center mb-5 gsap-fade-up">
+        <h2 class="section-title text-white">Experience SkyReserve</h2>
+        <p class="section-subtitle text-white-50">Advanced interactive tools for modern air travel</p>
+    </div>
+
+    <div class="container">
+        <div class="row g-4 justify-content-center">
+            <!-- 3D Parallax Tilt Cards -->
+            <div class="col-lg-4 col-md-6 gsap-card-stagger">
+                <div class="feature-3d-card tilt-card" data-tilt data-tilt-max="15" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.3">
+                    <div class="feature-icon"><i class="bi bi-airplane-engines"></i></div>
+                    <h3>6 Global Airlines</h3>
+                    <p>Track flights for AirCan, USAir, BritAir, AirFrance, LuftAir, and ItalAir.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 gsap-card-stagger">
+                <div class="feature-3d-card tilt-card" data-tilt data-tilt-max="15" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.3">
+                    <div class="feature-icon"><i class="bi bi-clock-history"></i></div>
+                    <h3 class="counter-3d" data-target="10">0</h3>
+                    <p>Real-time DBMS SQL outcome queries executing milliseconds fast.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 gsap-card-stagger">
+                <div class="feature-3d-card tilt-card" data-tilt data-tilt-max="15" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.3">
+                    <div class="feature-icon"><i class="bi bi-currency-exchange"></i></div>
+                    <h3>Live Exchanges</h3>
+                    <p>Dynamic multi-currency booking engine with live tax computations.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- LOGIN SECTION (System Access) -->
+<section class="login-section" id="login-section">
+    <div class="login-section-inner gsap-fade-up">
+        <div class="login-section-info">
+            <h2>Admin Dashboard</h2>
+            <p>Access the central database for all 12 global booking offices.</p>
+            <div class="login-features">
+                <div class="login-feature"><i class="bi bi-check-circle-fill" style="color:var(--emerald-400)"></i>Manage customers & flights</div>
+                <div class="login-feature"><i class="bi bi-check-circle-fill" style="color:var(--emerald-400)"></i>Process bookings & availability</div>
+                <div class="login-feature"><i class="bi bi-check-circle-fill" style="color:var(--emerald-400)"></i>Generate revenue/SQL reports</div>
+            </div>
+        </div>
+        <div class="login-form-card tilt-card" data-tilt data-tilt-max="5" data-tilt-speed="600" style="background: rgba(15,23,42,0.6); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; color:white;">
+            <div class="login-form-header">
+                <div class="login-logo" style="background: linear-gradient(135deg, var(--sky-400), var(--sky-600));">
+                    <i class="bi bi-lock text-white"></i>
+                </div>
+                <h3 class="text-white mt-3">Secure Login</h3>
+            </div>
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show mx-4" role="alert" style="font-size:0.85rem;border-radius:10px;">
+                <i class="bi bi-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('login_post') }}" class="login-form-body p-4">
+                <div class="input-icon-wrapper mb-3" style="position:relative;">
+                    <i class="bi bi-person text-white-50" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);z-index:2;"></i>
+                    <input type="text" id="username" name="username" class="form-control text-white"
+                           placeholder="Username" required autocomplete="off" style="padding-left:45px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); height:54px;">
+                </div>
+                <div class="input-icon-wrapper mb-4" style="position:relative;">
+                    <i class="bi bi-lock text-white-50" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);z-index:2;"></i>
+                    <input type="password" id="password" name="password" class="form-control text-white"
+                           placeholder="Password" required style="padding-left:45px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); height:54px;">
+                </div>
+                <button type="submit" class="btn btn-primary w-100 gsap-3d-btn" style="height:54px; font-weight:600; font-size:1.05rem;">
+                    Access System <i class="bi bi-arrow-right ms-2"></i>
+                </button>
+            </form>
+            
+            <div class="text-center pb-4 text-white-50" style="font-size:0.85rem;">
+                <i class="bi bi-info-circle me-1"></i> Use <strong>admin / admin</strong> to login
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer" style="background:#0f172a; border-top:1px solid rgba(255,255,255,0.05);">
+    <div class="footer-inner text-white-50">
+        <div class="footer-brand text-white">
+            <i class="bi bi-airplane-engines me-2"></i>SkyReserve
+        </div>
+        <p class="footer-copy mt-3 mb-0">© 2026 SkyReserve Airlines — B.Tech CSE-AIML Case Study Project</p>
+    </div>
+</footer>
+{% endblock %}
+
+{% block scripts %}
+<!-- 3D GLOBE & ANIMATION LIBRARIES -->
+<script src="//unpkg.com/globe.gl"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tsparticles-preset-stars@2/tsparticles.preset.stars.bundle.min.js"></script>
+
+<script>
+    // These will be configured inside static/script.js to maintain clean templates.
+    // The globe container is #globeViz
+    // The particles container is #tsparticles
+</script>
+{% endblock %}

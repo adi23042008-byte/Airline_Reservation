@@ -1,0 +1,69 @@
+<!-- Premium Sidebar Navigation -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-logo">
+            <i class="bi bi-airplane-engines"></i>
+            <span class="sidebar-brand">SkyReserve</span>
+        </div>
+        <button class="sidebar-toggle-btn d-lg-none" onclick="toggleSidebar()">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
+
+    <nav class="sidebar-nav">
+        <div class="nav-section">
+            <span class="nav-section-title">Overview</span>
+            <a href="{{ url_for('dashboard') }}" class="nav-link-custom {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                <i class="bi bi-grid-1x2-fill"></i>
+                <span>Dashboard</span>
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <span class="nav-section-title">Operations</span>
+            <a href="{{ url_for('customers') }}" class="nav-link-custom {% if request.endpoint == 'customers' %}active{% endif %}">
+                <i class="bi bi-people-fill"></i>
+                <span>Customers</span>
+            </a>
+            <a href="{{ url_for('flights') }}" class="nav-link-custom {% if request.endpoint == 'flights' %}active{% endif %}">
+                <i class="bi bi-airplane-fill"></i>
+                <span>Flights</span>
+            </a>
+            <a href="{{ url_for('availability') }}" class="nav-link-custom {% if request.endpoint == 'availability' %}active{% endif %}">
+                <i class="bi bi-calendar-check-fill"></i>
+                <span>Availability</span>
+            </a>
+            <a href="{{ url_for('bookings') }}" class="nav-link-custom {% if request.endpoint == 'bookings' %}active{% endif %}">
+                <i class="bi bi-bookmark-star-fill"></i>
+                <span>Bookings</span>
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <span class="nav-section-title">Finance</span>
+            <a href="{{ url_for('currency') }}" class="nav-link-custom {% if request.endpoint == 'currency' %}active{% endif %}">
+                <i class="bi bi-currency-exchange"></i>
+                <span>Currency Exchange</span>
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <span class="nav-section-title">Intelligence</span>
+            <a href="{{ url_for('reports') }}" class="nav-link-custom {% if request.endpoint == 'reports' %}active{% endif %}">
+                <i class="bi bi-bar-chart-line-fill"></i>
+                <span>Reports</span>
+            </a>
+            <a href="{{ url_for('queries') }}" class="nav-link-custom {% if request.endpoint == 'queries' %}active{% endif %}">
+                <i class="bi bi-database-fill-gear"></i>
+                <span>SQL Queries</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="sidebar-footer">
+        <a href="{{ url_for('login') }}" class="nav-link-custom logout-link">
+            <i class="bi bi-box-arrow-left"></i>
+            <span>Logout</span>
+        </a>
+    </div>
+</aside>
